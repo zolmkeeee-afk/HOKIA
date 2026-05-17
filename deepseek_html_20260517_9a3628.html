@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Кузница Силы | Светлая / Тёмная тема + Прокачка</title>
+    <style>
+        * {
+            user-select: none;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s ease, border-color 0.2s, color 0.15s;
+        }
+
+        /* === СВЕТЛАЯ ТЕМА (по умолчанию) === */
+        body.light {
+            --bg-gradient-start: #e8e0c8;
+            --bg-gradient-end: #cbd2b0;
+            --card-bg: rgba(245, 240, 225, 0.9);
+            --border-glow: #e0a34b;
+            --text-primary: #2c2416;
+            --text-secondary: #4a3e2c;
+            --phone-bg: #ddd0b0;
+            --nokia-base: #bfaa7c;
+            --screen-bg: #f0f7e6;
+            --hp-color: #2c6e2c;
+            --btn-hit: #b3443f;
+            --btn-hit-shadow: #732a26;
+            --stat-bg: #e2d8bdcc;
+            --log-bg: #ece1c6aa;
+            --log-text: #2f2a1f;
+            --upgrade-card: #efebdb;
+        }
+
+        /* === ТЁМНАЯ ТЕМА === */
+        body.dark {
+            --bg-gradient-start: #1e1a17;
+            --bg-gradient-end: #0b0a07;
+            --card-bg: #1f1c17cc;
+            --border-glow: #ffb34780;
+            --text-primary: #ffdfb3;
+            --text-secondary: #d4c8aa;
+            --phone-bg: #2a241e;
+            --nokia-base: #2d2a1f;
+            --screen-bg: #d7efcf;
+            --hp-color: #235b1a;
+            --btn-hit: #d9534f;
+            --btn-hit-shadow: #962b2b;
+            --stat-bg: #0c0c0cee;
+            --log-bg: #000000aa;
+            --log-text: #eeddbb;
+            --upgrade-card: #28241ed9;
+        }
+
+        body {
+            background: radial-gradient(circle at 30% 10%, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* мастер контейнер */
+        .master-container {
+            max-width: 1300px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        /* блок битвы, магазин, настройки */
+        .battle-area, .shop-area, .settings-area {
+            backdrop-filter: blur(10px);
+            border-radius: 64px;
+            padding: 20px;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .battle-area {
+            flex: 2;
+            min-width: 280px;
+            background: var(--card-bg);
+        }
+
+        .shop-area {
+            flex: 1.5;
+            min-width: 260px;
+            background: var(--card-bg);
+        }
+
+        .settings-area {
+            flex: 1;
+            min-width: 220px;
+            background: var(--card-bg);
+        }
+
+        h2, h3 {
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+        }
+
+        .phone-card {
+            background: var(--phone-bg);
+            border-radius: 48px;
+            padding: 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.05s linear;
+            box-shadow: inset 0 0 0 2px #ab8b4c, 0 8px 15px black;
+        }
+
+        .nokia-body {
+            background: var(--nokia-base);
+            border-radius: 35px;
+            padding: 16px 12px 20px;
+            box-shadow: inset 0 0 0 3px #c8a857, 0 6px 0 #4d3e26;
+        }
+
+        .screen {
+            background: var(--screen-bg);
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .hp-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: monospace;
+            color: var(--hp-color);
+        }
+
+        .health-bar {
+            background: #5e3a28;
+            border-radius: 20px;
+            height: 16px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            width: 100%;
+            background: #6fcf6a;
+            height: 100%;
+            transition: width 0.2s;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: var(--stat-bg);
+            border-radius: 40px;
+            padding: 8px 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stat {
+            font-size: 0.8rem;
+            background: #00000066;
+            border-radius: 30px;
+            padding: 4px 12px;
+            color: var(--text-secondary);
+        }
+
+        .stat span {
+            color: #ffcd94;
+            font-weight: bold;
+        }
+
+        .hit-btn {
+            background: var(--btn-hit);
+            border: none;
+            width: 100%;
+            font-size: 1.5rem;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--btn-hit-shadow);
+            transition: 0.05s linear;
+            margin: 8px 0;
+        }
+
+        .hit-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--btn-hit-shadow); }
+        .reset-btn { background: #5f7343; box-shadow: 0 5px 0 #2f3a1f; }
+
+        .upgrade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .upgrade-card {
+            background: var(--upgrade-card);
+            border-radius: 48px;
+            padding: 12px 18px;
+            border-left: 8px solid #f5b042;
+        }
+
+        .upgrade-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .upgrade-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .upgrade-cost {
+            display: inline-block;
+            background: #0e0b06;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-family: monospace;
+            font-weight: bold;
+            margin: 8px 0;
+            color: #ffdfaa;
+        }
+
+        .upgrade-btn {
+            background: #eb9e3e;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+            font-family: monospace;
+            box-shadow: 0 3px 0 #8b571f;
+        }
+        .upgrade-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #8b571f; }
+
+        .currency {
+            background: #050302aa;
+            border-radius: 60px;
+            padding: 6px 18px;
+            text-align: center;
+            margin-bottom: 18px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffdfaa;
+        }
+
+        .log-area {
+            background: var(--log-bg);
+            border-radius: 35px;
+            padding: 10px;
+            height: 110px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            color: var(--log-text);
+        }
+
+        .log-entry {
+            border-left: 3px solid #ffaa44;
+            padding-left: 8px;
+            margin: 4px 0;
+        }
+
+        /* Настройки темы */
+        .theme-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .theme-btn {
+            background: #2f2a24;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.1s;
+            color: white;
+        }
+        .theme-btn.light-btn { background: #e7c27d; color: #2c2b1f; box-shadow: 0 2px 5px rgba(0,0,0,0.2);}
+        .theme-btn.dark-btn { background: #2a281f; color: #ffeaac; box-shadow: 0 2px 5px black;}
+
+        .settings-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+
+        button:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+        @media (max-width: 900px) {
+            .master-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body class="light">
+<div class="master-container">
+    <!-- БИТВА С НОКИЕЙ -->
+    <div class="battle-area">
+        <h2>📞 NOKIA CRUSHER</h2>
+        <div class="phone-card" id="phoneArena">
+            <div class="nokia-body" id="nokiaBody">
+                <div class="screen">
+                    <div class="hp-text" id="hpPercent">100%</div>
+                    <div class="health-bar"><div class="health-fill" id="healthFill"></div></div>
+                </div>
+                <div style="display:flex; gap:6px; justify-content:space-between">
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat">💪 СИЛА: <span id="damageStat">20-40</span></div>
+            <div class="stat">🏆 УНИЧТОЖЕНО: <span id="destroyedStat">0</span></div>
+            <div class="stat">💚 HP НОКИИ: <span id="currentHpStat">100</span></div>
+        </div>
+        <button class="hit-btn" id="hitBtn">💥 РАЗБИТЬ НОКИА 💥</button>
+        <button class="hit-btn reset-btn" id="resetBattleBtn">🔄 СБРОСИТЬ БОЙ</button>
+        <div class="log-area" id="battleLog"><div class="log-entry">💪 Нокиа #1, 100 HP. Куй силу в магазине!</div></div>
+    </div>
+
+    <!-- МАГАЗИН ПРОКАЧКИ СИЛЫ -->
+    <div class="shop-area">
+        <h2>🏪 КУЗНИЦА СИЛЫ</h2>
+        <div class="currency">💎 <span id="currencyAmount">150</span> МОНЕТ</div>
+        <div class="upgrade-list" id="upgradeShop"></div>
+        <div class="log-area" id="shopLog"><div class="log-entry">🏪 Покупай улучшения силы! Каждый уровень +4 к мин. урону, +6 к макс.</div></div>
+    </div>
+
+    <!-- НАСТРОЙКИ: СВЕТЛАЯ / ТЁМНАЯ ТЕМА -->
+    <div class="settings-area">
+        <h3>⚙️ НАСТРОЙКИ</h3>
+        <div class="theme-buttons">
+            <button class="theme-btn light-btn" id="lightThemeBtn">☀️ СВЕТЛАЯ</button>
+            <button class="theme-btn dark-btn" id="darkThemeBtn">🌙 ТЁМНАЯ</button>
+        </div>
+        <div class="settings-note">
+            📱 Тема сохраняется в телефоне. <br>
+            🔧 Влияет на фон, карточки, текст и кнопки.
+        </div>
+        <div class="log-area" style="margin-top:25px; height:auto;">
+            <div class="log-entry">🎨 Выбери оформление под настроение.</div>
+            <div class="log-entry">⚡ Прогресс битвы и сила сохраняются автономно.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== 1. ЛОГИКА ИГРЫ (НОКИА + ПРОКАЧКА СИЛЫ) ==========
+    let powerLevel = 1;
+    let baseMinDamage = 18;
+    let baseMaxDamage = 32;
+
+    function getCurrentDamageRange() {
+        let bonusMin = (powerLevel - 1) * 4;
+        let bonusMax = (powerLevel - 1) * 6;
+        return { min: baseMinDamage + bonusMin, max: baseMaxDamage + bonusMax };
+    }
+
+    let currentNokiaHp = 100, maxNokiaHp = 100, nokiaLevel = 1, destroyedCount = 0, isBroken = false, hitCounter = 0;
+    let coins = 150;
+
+    // DOM элементы
+    const hpPercentSpan = document.getElementById('hpPercent');
+    const healthFillDiv = document.getElementById('healthFill');
+    const damageStatSpan = document.getElementById('damageStat');
+    const destroyedStatSpan = document.getElementById('destroyedStat');
+    const currentHpStatSpan = document.getElementById('currentHpStat');
+    const hitBtn = document.getElementById('hitBtn');
+    const resetBattleBtn = document.getElementById('resetBattleBtn');
+    const battleLogDiv = document.getElementById('battleLog');
+    const phoneArena = document.getElementById('phoneArena');
+    const nokiaBodyDiv = document.getElementById('nokiaBody');
+    const currencySpan = document.getElementById('currencyAmount');
+    const upgradeShopDiv = document.getElementById('upgradeShop');
+    const shopLogDiv = document.getElementById('shopLog');
+
+    function addBattleLog(msg, isError = false) {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        if (isError) entry.style.borderLeftColor = "#e8554e";
+        entry.innerHTML = `📟 ${msg}`;
+        battleLogDiv.prepend(entry);
+        while(battleLogDiv.children.length > 15) battleLogDiv.removeChild(battleLogDiv.lastChild);
+    }
+
+    function addShopLog(msg, isGood = true) {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.style.borderLeftColor = isGood ? "#f5b042" : "#e86f6f";
+        entry.innerHTML = `💰 ${msg}`;
+        shopLogDiv.prepend(entry);
+        while(shopLogDiv.children.length > 10) shopLogDiv.removeChild(shopLogDiv.lastChild);
+    }
+
+    function updateBattleUI() {
+        let percent = (currentNokiaHp / maxNokiaHp) * 100;
+        if (percent < 0) percent = 0;
+        hpPercentSpan.innerText = Math.floor(percent) + "%";
+        healthFillDiv.style.width = percent + "%";
+        currentHpStatSpan.innerText = Math.floor(currentNokiaHp);
+        destroyedStatSpan.innerText = destroyedCount;
+        const dmg = getCurrentDamageRange();
+        damageStatSpan.innerText = `${dmg.min}-${dmg.max}`;
+        if (currentNokiaHp <= 0 && !isBroken) {
+            isBroken = true;
+            hitBtn.disabled = true;
+            nokiaBodyDiv.style.filter = "brightness(0.5) grayscale(0.6)";
+            addBattleLog(`💀 НОКИА #${nokiaLevel} УНИЧТОЖЕНА! +монеты...`, true);
+            setTimeout(() => { if (isBroken) spawnNextNokia(); }, 1200);
+        } else {
+            if (currentNokiaHp > 0 && isBroken) isBroken = false;
+            nokiaBodyDiv.style.filter = "";
+        }
+        if (currentNokiaHp <= 0 && isBroken) hitBtn.disabled = true;
+        else hitBtn.disabled = false;
+        if (percent > 60) healthFillDiv.style.background = "#6fcf6a";
+        else if (percent > 25) healthFillDiv.style.background = "#f0b27a";
+        else healthFillDiv.style.background = "#e67e22";
+    }
+
+    function grantCoinsForDestruction() {
+        let reward = 35 + Math.floor(nokiaLevel * 1.8);
+        coins += reward;
+        addShopLog(`🎉 Уничтожение Нокии #${nokiaLevel} принесло ${reward} монет!`, true);
+        updateShopUI();
+        saveGameData();
+    }
+
+    function spawnNextNokia() {
+        if (!isBroken && currentNokiaHp > 0) return;
+        if (destroyedCount > 0 || nokiaLevel > 1) grantCoinsForDestruction();
+        nokiaLevel++;
+        destroyedCount++;
+        let newMaxHp = Math.floor(maxNokiaHp * 1.3);
+        maxNokiaHp = newMaxHp;
+        currentNokiaHp = maxNokiaHp;
+        isBroken = false;
+        hitCounter = 0;
+        hitBtn.disabled = false;
+        nokiaBodyDiv.style.filter = "";
+        updateBattleUI();
+        addBattleLog(`✨ НОВАЯ НОКИА #${nokiaLevel} с HP ${maxNokiaHp} (+30%) ✨`, false);
+        saveGameData();
+    }
+
+    function hitNokia() {
+        if (isBroken) { addBattleLog("Нокиа уже разбита, новая появится...", true); return; }
+        if (currentNokiaHp <= 0) return;
+        phoneArena.style.transform = "scale(0.98)";
+        setTimeout(() => phoneArena.style.transform = "", 100);
+        const dmgRange = getCurrentDamageRange();
+        let damage = Math.floor(Math.random() * (dmgRange.max - dmgRange.min + 1) + dmgRange.min);
+        let isCrit = Math.random() < 0.18;
+        if (isCrit) { damage = Math.floor(damage * 1.5); addBattleLog(`💥 КРИТ! +${damage} урона`, false); }
+        let actualDamage = Math.min(damage, currentNokiaHp);
+        currentNokiaHp -= actualDamage;
+        if (currentNokiaHp < 0) currentNokiaHp = 0;
+        hitCounter++;
+        addBattleLog(`🔨 Удар #${hitCounter} | Урон ${actualDamage} | Осталось ${Math.floor(currentNokiaHp)}/${maxNokiaHp} HP`);
+        updateBattleUI();
+        saveGameData();
+    }
+
+    function resetBattle() {
+        if (confirm("Сбросить прогресс Нокии? Сила и монеты останутся. Нокия #1 (100 HP)")) {
+            nokiaLevel = 1; destroyedCount = 0; maxNokiaHp = 100; currentNokiaHp = 100; isBroken = false; hitCounter = 0;
+            updateBattleUI();
+            addBattleLog("🔄 БОЙ СБРОШЕН! Первая Нокия вернулась.", false);
+            saveGameData();
+        }
+    }
+
+    // МАГАЗИН ПРОКАЧКИ
+    function getUpgradeCost() { return Math.floor(80 + (powerLevel - 1) * 25); }
+    function upgradePower() {
+        let cost = getUpgradeCost();
+        if (coins >= cost) {
+            coins -= cost;
+            powerLevel++;
+            updateShopUI();
+            updateBattleUI();
+            addShopLog(`⭐ СИЛА до ${powerLevel} уровня! Урон вырос. След. цена: ${getUpgradeCost()} монет`, true);
+            saveGameData();
+        } else {
+            addShopLog(`❌ Нужно ${cost} монет. Уничтожай Нокии!`, false);
+        }
+    }
+
+    function updateShopUI() {
+        currencySpan.innerText = Math.floor(coins);
+        const cost = getUpgradeCost();
+        upgradeShopDiv.innerHTML = `
+            <div class="upgrade-card">
+                <div class="upgrade-title">🔨 ПОВЫСИТЬ СИЛУ УДАРА</div>
+                <div class="upgrade-desc">Уровень: ${powerLevel} | Урон: ${getCurrentDamageRange().min}-${getCurrentDamageRange().max}</div>
+                <div class="upgrade-desc">След. уровень: мин+4, макс+6</div>
+                <div class="upgrade-cost">💰 ЦЕНА: ${cost} МОНЕТ</div>
+                <button class="upgrade-btn" id="upgradePowerBtn">💪 УЛУЧШИТЬ</button>
+            </div>
+            <div class="upgrade-card">
+                <div class="upgrade-title">⚡ СОВЕТ</div>
+                <div class="upgrade-desc">Уничтожайте Нокии, чтобы получать монеты и качать силу!</div>
+            </div>
+        `;
+        const upgradeBtn = document.getElementById('upgradePowerBtn');
+        if (upgradeBtn) upgradeBtn.addEventListener('click', upgradePower);
+    }
+
+    // Сохранение / загрузка
+    function saveGameData() {
+        const data = { powerLevel, coins, nokiaLevel, destroyedCount, maxNokiaHp, currentNokiaHp, isBroken, hitCounter };
+        localStorage.setItem('nokiaPowerShopSave', JSON.stringify(data));
+    }
+    function loadGameData() {
+        const saved = localStorage.getItem('nokiaPowerShopSave');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                powerLevel = data.powerLevel || 1;
+                coins = data.coins ?? 150;
+                nokiaLevel = data.nokiaLevel || 1;
+                destroyedCount = data.destroyedCount || 0;
+                maxNokiaHp = data.maxNokiaHp || 100;
+                currentNokiaHp = data.currentNokiaHp ?? maxNokiaHp;
+                isBroken = data.isBroken || false;
+                hitCounter = data.hitCounter || 0;
+                if (currentNokiaHp <= 0) isBroken = true;
+                updateBattleUI();
+                updateShopUI();
+                addBattleLog(`📀 Загружен прогресс: Сила ур.${powerLevel}, монет:${coins}, уничтожено:${destroyedCount}`, false);
+                if(isBroken && currentNokiaHp <= 0) setTimeout(() => { if(isBroken) spawnNextNokia(); }, 500);
+            } catch(e) {}
+        } else { updateShopUI(); updateBattleUI(); }
+    }
+
+    // ========== 2. НАСТРОЙКИ ТЕМЫ (СВЕТЛАЯ / ТЁМНАЯ) ==========
+    function setTheme(theme) {
+        document.body.classList.remove('light', 'dark');
+        document.body.classList.add(theme);
+        localStorage.setItem('nokiaTheme', theme);
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('nokiaTheme');
+        if (savedTheme === 'dark') setTheme('dark');
+        else setTheme('light');
+    }
+
+    // обработчики кнопок тем
+    document.getElementById('lightThemeBtn').addEventListener('click', () => setTheme('light'));
+    document.getElementById('darkThemeBtn').addEventListener('click', () => setTheme('dark'));
+
+    // Инициализация событий
+    hitBtn.addEventListener('click', hitNokia);
+    resetBattleBtn.addEventListener('click', resetBattle);
+    phoneArena.addEventListener('click', (e) => {
+        if(e.target === hitBtn || hitBtn.contains(e.target)) return;
+        if(!isBroken && currentNokiaHp > 0) hitNokia();
+    });
+
+    loadTheme();
+    loadGameData();
+</script>
+</body>
+</html>
