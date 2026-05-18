@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Кузница Силы | Зелье удачи + Викторина + Колесо</title>
+    <style>
+        * {
+            user-select: none;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s ease, border-color 0.2s, color 0.15s;
+        }
+
+        /* === СВЕТЛАЯ ТЕМА === */
+        body.light {
+            --bg-gradient-start: #e8e0c8;
+            --bg-gradient-end: #cbd2b0;
+            --card-bg: rgba(245, 240, 225, 0.9);
+            --border-glow: #e0a34b;
+            --text-primary: #2c2416;
+            --text-secondary: #4a3e2c;
+            --phone-bg: #ddd0b0;
+            --nokia-base: #bfaa7c;
+            --screen-bg: #f0f7e6;
+            --hp-color: #2c6e2c;
+            --btn-hit: #b3443f;
+            --btn-hit-shadow: #732a26;
+            --stat-bg: #e2d8bdcc;
+            --log-bg: #ece1c6aa;
+            --log-text: #2f2a1f;
+            --upgrade-card: #efebdb;
+            --auto-card: #d6cca6;
+            --code-bg: #d4d0b6;
+            --chest-card: #f0dbaa;
+            --quiz-card: #cfe2c2;
+            --wheel-card: #e8d5b0;
+        }
+
+        /* === ТЁМНАЯ ТЕМА === */
+        body.dark {
+            --bg-gradient-start: #1e1a17;
+            --bg-gradient-end: #0b0a07;
+            --card-bg: #1f1c17cc;
+            --border-glow: #ffb34780;
+            --text-primary: #ffdfb3;
+            --text-secondary: #d4c8aa;
+            --phone-bg: #2a241e;
+            --nokia-base: #2d2a1f;
+            --screen-bg: #d7efcf;
+            --hp-color: #235b1a;
+            --btn-hit: #d9534f;
+            --btn-hit-shadow: #962b2b;
+            --stat-bg: #0c0c0cee;
+            --log-bg: #000000aa;
+            --log-text: #eeddbb;
+            --upgrade-card: #28241ed9;
+            --auto-card: #2b2a1f;
+            --code-bg: #2a281e;
+            --chest-card: #3a2e1f;
+            --quiz-card: #2a3a2a;
+            --wheel-card: #3a3220;
+        }
+
+        body {
+            background: radial-gradient(circle at 30% 10%, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .master-container {
+            max-width: 1600px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .battle-area, .shop-area, .settings-area, .codes-area, .games-area {
+            backdrop-filter: blur(10px);
+            border-radius: 64px;
+            padding: 20px;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .battle-area { flex: 2; min-width: 280px; background: var(--card-bg); }
+        .shop-area { flex: 1.8; min-width: 280px; background: var(--card-bg); }
+        .games-area { flex: 2; min-width: 320px; background: var(--card-bg); }
+        .codes-area { flex: 1.2; min-width: 240px; background: var(--card-bg); }
+        .settings-area { flex: 1; min-width: 220px; background: var(--card-bg); }
+
+        h2, h3 {
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+        }
+
+        /* Вкладки внутри игр */
+        .games-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .games-tab-btn {
+            background: #2f2a24;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ffdfaa;
+            font-family: monospace;
+            transition: 0.1s;
+        }
+        .games-tab-btn.active {
+            background: #f0a342;
+            color: #1f1a0e;
+            box-shadow: 0 2px 0 #8b571f;
+        }
+        .game-pane {
+            display: none;
+            animation: fade 0.2s;
+        }
+        .game-pane.active-pane {
+            display: block;
+        }
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(5px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .phone-card {
+            background: var(--phone-bg);
+            border-radius: 48px;
+            padding: 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.05s linear;
+            box-shadow: inset 0 0 0 2px #ab8b4c, 0 8px 15px black;
+        }
+
+        .nokia-body {
+            background: var(--nokia-base);
+            border-radius: 35px;
+            padding: 16px 12px 20px;
+            box-shadow: inset 0 0 0 3px #c8a857, 0 6px 0 #4d3e26;
+        }
+
+        .screen {
+            background: var(--screen-bg);
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .hp-text { font-size: 1.8rem; font-weight: bold; font-family: monospace; color: var(--hp-color); }
+        .health-bar { background: #5e3a28; border-radius: 20px; height: 16px; margin-top: 8px; overflow: hidden; }
+        .health-fill { width: 100%; background: #6fcf6a; height: 100%; transition: width 0.2s; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: var(--stat-bg);
+            border-radius: 40px;
+            padding: 8px 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .stat { font-size: 0.8rem; background: #00000066; border-radius: 30px; padding: 4px 12px; color: var(--text-secondary); }
+        .stat span { color: #ffcd94; font-weight: bold; }
+
+        .hit-btn {
+            background: var(--btn-hit);
+            border: none;
+            width: 100%;
+            font-size: 1.5rem;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--btn-hit-shadow);
+            transition: 0.05s linear;
+            margin: 8px 0;
+        }
+        .hit-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--btn-hit-shadow); }
+        .reset-btn { background: #5f7343; box-shadow: 0 5px 0 #2f3a1f; }
+
+        .auto-clicker-card, .chest-card, .potion-card {
+            background: var(--auto-card);
+            border-radius: 48px;
+            padding: 16px;
+            margin: 15px 0;
+            border-left: 8px solid #42c5f0;
+        }
+        .chest-card { border-left-color: #f0a342; background: var(--chest-card); }
+        .potion-card { border-left-color: #8b5cf6; background: var(--chest-card); }
+        .auto-stats {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .upgrade-list { display: flex; flex-direction: column; gap: 18px; margin: 20px 0; }
+        .upgrade-card {
+            background: var(--upgrade-card);
+            border-radius: 48px;
+            padding: 12px 18px;
+            border-left: 8px solid #f5b042;
+        }
+        .upgrade-title { font-size: 1.2rem; font-weight: bold; color: var(--text-primary); }
+        .upgrade-desc { font-size: 0.75rem; color: var(--text-secondary); }
+        .upgrade-cost {
+            display: inline-block;
+            background: #0e0b06;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-family: monospace;
+            font-weight: bold;
+            margin: 8px 0;
+            color: #ffdfaa;
+        }
+        .upgrade-btn {
+            background: #eb9e3e;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+            font-family: monospace;
+            box-shadow: 0 3px 0 #8b571f;
+        }
+        .upgrade-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #8b571f; }
+        .currency {
+            background: #050302aa;
+            border-radius: 60px;
+            padding: 6px 18px;
+            text-align: center;
+            margin-bottom: 18px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffdfaa;
+        }
+        .log-area {
+            background: var(--log-bg);
+            border-radius: 35px;
+            padding: 10px;
+            height: 110px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            color: var(--log-text);
+        }
+        .log-entry { border-left: 3px solid #ffaa44; padding-left: 8px; margin: 4px 0; }
+
+        .quiz-container, .wheel-container {
+            background: var(--quiz-card);
+            border-radius: 48px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .question-text { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--text-primary); }
+        .answers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .answer-btn { background: #4a6a3e; border: none; padding: 12px; border-radius: 60px; font-weight: bold; cursor: pointer; color: white; font-family: monospace; }
+        .quiz-stats { display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.9rem; font-weight: bold; }
+        .next-quiz-btn { width: 100%; margin-top: 15px; }
+        .quiz-result { text-align: center; margin-top: 15px; font-weight: bold; }
+
+        .wheel-multipliers { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 20px 0; }
+        .multiplier-chip { background: #f0a342; padding: 8px 16px; border-radius: 40px; font-weight: bold; font-size: 1.2rem; color: #1f1a0e; }
+        .wheel-result { font-size: 1.5rem; font-weight: bold; text-align: center; margin: 15px 0; padding: 12px; background: #00000066; border-radius: 60px; }
+        .bet-input { background: var(--code-bg); border: 2px solid #f5b042; border-radius: 60px; padding: 10px 16px; font-size: 1rem; text-align: center; width: 150px; font-family: monospace; font-weight: bold; }
+        .wheel-controls { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; margin: 15px 0; }
+
+        .code-input-group { display: flex; gap: 10px; margin: 15px 0; }
+        .code-input { flex: 2; background: var(--code-bg); border: 2px solid #f5b042; border-radius: 60px; padding: 12px 16px; font-size: 1rem; text-align: center; color: var(--text-primary); outline: none; }
+        .code-submit { background: #42c5f0; border: none; border-radius: 60px; padding: 0 20px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #1c7ca0; }
+        .theme-buttons { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
+        .theme-btn { background: #2f2a24; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; color: white; }
+        .theme-btn.light-btn { background: #e7c27d; color: #2c2b1f; }
+        .theme-btn.dark-btn { background: #2a281f; color: #ffeaac; }
+        .settings-note { font-size: 0.7rem; text-align: center; margin-top: 20px; color: var(--text-secondary); }
+        button:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+        @media (max-width: 1200px) { .master-container { flex-direction: column; } .answers-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="light">
+<div class="master-container">
+    <!-- БИТВА С НОКИЕЙ -->
+    <div class="battle-area">
+        <h2>📞 NOKIA CRUSHER</h2>
+        <div class="phone-card" id="phoneArena">
+            <div class="nokia-body" id="nokiaBody">
+                <div class="screen">
+                    <div class="hp-text" id="hpPercent">100%</div>
+                    <div class="health-bar"><div class="health-fill" id="healthFill"></div></div>
+                </div>
+                <div style="display:flex; gap:6px; justify-content:space-between">
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                    <div style="background:#514d38; width:22%; height:24px; border-radius:12px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat">💪 СИЛА: <span id="damageStat">20-40</span></div>
+            <div class="stat">🏆 УНИЧТОЖЕНО: <span id="destroyedStat">0</span></div>
+            <div class="stat">💚 HP НОКИИ: <span id="currentHpStat">100</span></div>
+        </div>
+        <button class="hit-btn" id="hitBtn">💥 РАЗБИТЬ НОКИА 💥</button>
+        <button class="hit-btn reset-btn" id="resetBattleBtn">🔄 СБРОСИТЬ БОЙ</button>
+        <div class="log-area" id="battleLog"><div class="log-entry">💪 Нокиа #1, 100 HP. Играй в игры!</div></div>
+    </div>
+
+    <!-- МАГАЗИН: ПРОКАЧКА + ЯЩИК + ЗЕЛЬЕ УДАЧИ -->
+    <div class="shop-area">
+        <h2>🏪 КУЗНИЦА СИЛЫ & УДАЧА</h2>
+        <div class="currency">💎 <span id="currencyAmount">150</span> МОНЕТ</div>
+        
+        <div class="auto-clicker-card">
+            <div class="upgrade-title">🤖 АВТО-КЛИКЕР</div>
+            <div class="auto-stats"><span>Уровень: <span id="autoLevel">0</span></span><span>Ударов/сек: <span id="autoHitsPerSec">0</span></span></div>
+            <div class="upgrade-cost" id="autoCostDisplay">💰 ЦЕНА: 500 МОНЕТ</div>
+            <button class="upgrade-btn" id="buyAutoBtn">🤖 КУПИТЬ / УЛУЧШИТЬ</button>
+        </div>
+
+        <div class="chest-card">
+            <div class="upgrade-title">🎁 ТАИНСТВЕННЫЙ ЯЩИК</div>
+            <div class="upgrade-desc">Шансы: 1% — 20.000.000, 50% — 1.000.000, 85% — 5.000, 89% — 1.000</div>
+            <div class="upgrade-cost">💰 ЦЕНА: 20.000 МОНЕТ</div>
+            <button class="upgrade-btn" id="openChestBtn">🎲 ОТКРЫТЬ ЯЩИК</button>
+        </div>
+
+        <!-- НОВОЕ ЗЕЛЬЕ УДАЧИ за 100.000 монет -->
+        <div class="potion-card">
+            <div class="upgrade-title">🧪 ЗЕЛЬЕ УДАЧИ</div>
+            <div class="upgrade-desc">Умножает ваши монеты!<br>⚡ x0.5 (10%) | x1 (20%) | x1.5 (20%) | x2 (30%) | x3 (15%) | x10 (5%)</div>
+            <div class="upgrade-cost">💰 ЦЕНА: 100.000 МОНЕТ</div>
+            <button class="upgrade-btn" id="usePotionBtn">🧪 ВЫПИТЬ ЗЕЛЬЕ</button>
+        </div>
+
+        <div class="upgrade-list" id="upgradeShop"></div>
+        <div class="log-area" id="shopLog"><div class="log-entry">🏪 Покупай улучшения!</div></div>
+    </div>
+
+    <!-- ИГРЫ: ВИКТОРИНА + КОЛЕСО ФОРТУНЫ -->
+    <div class="games-area">
+        <h3>🎮 ИГРЫ</h3>
+        <div class="games-tabs">
+            <button class="games-tab-btn active" data-game="quiz">📚 ВИКТОРИНА</button>
+            <button class="games-tab-btn" data-game="wheel">🎡 КОЛЕСО ФОРТУНЫ (x2-x10)</button>
+        </div>
+
+        <div id="quizPane" class="game-pane active-pane">
+            <div class="quiz-container">
+                <div class="question-text" id="questionText">Загрузка...</div>
+                <div class="answers-grid" id="answersGrid"></div>
+                <div class="quiz-stats">
+                    <span>📊 Счёт: <span id="quizScore">0</span></span>
+                    <span>🏆 Правильно: <span id="correctCount">0</span> / <span id="totalAnswered">0</span></span>
+                </div>
+                <button class="upgrade-btn next-quiz-btn" id="nextQuestionBtn">➡️ СЛЕДУЮЩИЙ ВОПРОС</button>
+                <div class="quiz-result" id="quizResult"></div>
+            </div>
+            <div class="log-area" id="quizLog"><div class="log-entry">🎯 Ответь на вопрос, получи +50 монет!</div></div>
+        </div>
+
+        <div id="wheelPane" class="game-pane">
+            <div class="wheel-container">
+                <div class="wheel-multipliers">
+                    <span class="multiplier-chip">x2</span><span class="multiplier-chip">x3</span><span class="multiplier-chip">x4</span>
+                    <span class="multiplier-chip">x5</span><span class="multiplier-chip">x6</span><span class="multiplier-chip">x7</span>
+                    <span class="multiplier-chip">x8</span><span class="multiplier-chip">x9</span><span class="multiplier-chip">x10</span>
+                </div>
+                <div class="wheel-result" id="wheelResult">🎡 Нажми КРУТИТЬ</div>
+                <div class="wheel-controls">
+                    <input type="number" id="betAmount" class="bet-input" value="100" min="10" step="10">
+                    <button class="upgrade-btn" id="spinWheelBtn">🎲 КРУТИТЬ КОЛЕСО</button>
+                </div>
+                <div class="upgrade-desc" style="text-align:center;">Ставка умножается на множитель (x2 до x10).</div>
+            </div>
+            <div class="log-area" id="wheelLog"><div class="log-entry">🎡 Крути колесо, умножай монеты!</div></div>
+        </div>
+    </div>
+
+    <!-- КОДЫ -->
+    <div class="codes-area">
+        <h3>🔐 СЕКРЕТНЫЙ КОД</h3>
+        <div class="code-input-group">
+            <input type="text" id="codeInput" class="code-input" placeholder="Введите код...">
+            <button id="submitCodeBtn" class="code-submit">🔥 АКТИВИРОВАТЬ</button>
+        </div>
+        <div class="code-info">📜 Код <span class="secret-badge">ded</span> — 1.000 монет</div>
+        <div class="log-area" id="codeLog"><div class="log-entry">💎 Введи "ded"</div></div>
+    </div>
+
+    <!-- НАСТРОЙКИ -->
+    <div class="settings-area">
+        <h3>⚙️ НАСТРОЙКИ</h3>
+        <div class="theme-buttons">
+            <button class="theme-btn light-btn" id="lightThemeBtn">☀️ СВЕТЛАЯ</button>
+            <button class="theme-btn dark-btn" id="darkThemeBtn">🌙 ТЁМНАЯ</button>
+        </div>
+        <div class="settings-note">Тема сохраняется.<br>Зелье удачи умножает ВСЕ ваши монеты!</div>
+    </div>
+</div>
+
+<script>
+    // ========== ОСНОВНАЯ ЛОГИКА (НОКИА + МАГАЗИН) ==========
+    let powerLevel = 1, baseMinDamage = 18, baseMaxDamage = 32;
+    function getCurrentDamageRange() {
+        let bonusMin = (powerLevel - 1) * 4, bonusMax = (powerLevel - 1) * 6;
+        return { min: baseMinDamage + bonusMin, max: baseMaxDamage + bonusMax };
+    }
+    let currentNokiaHp = 100, maxNokiaHp = 100, nokiaLevel = 1, destroyedCount = 0, isBroken = false, hitCounter = 0, coins = 150;
+    let autoLevel = 0, autoHitsPerSecond = 0, autoIntervalId = null;
+    let activatedCodes = JSON.parse(localStorage.getItem('activatedCodesBS')) || [];
+
+    // DOM боя
+    const hpPercentSpan = document.getElementById('hpPercent'), healthFillDiv = document.getElementById('healthFill');
+    const damageStatSpan = document.getElementById('damageStat'), destroyedStatSpan = document.getElementById('destroyedStat');
+    const currentHpStatSpan = document.getElementById('currentHpStat'), hitBtn = document.getElementById('hitBtn');
+    const resetBattleBtn = document.getElementById('resetBattleBtn'), battleLogDiv = document.getElementById('battleLog');
+    const phoneArena = document.getElementById('phoneArena'), nokiaBodyDiv = document.getElementById('nokiaBody');
+    const currencySpan = document.getElementById('currencyAmount'), upgradeShopDiv = document.getElementById('upgradeShop');
+    const shopLogDiv = document.getElementById('shopLog'), autoLevelSpan = document.getElementById('autoLevel');
+    const autoHitsPerSecSpan = document.getElementById('autoHitsPerSec'), autoCostDisplay = document.getElementById('autoCostDisplay');
+    const buyAutoBtn = document.getElementById('buyAutoBtn'), openChestBtn = document.getElementById('openChestBtn');
+    const usePotionBtn = document.getElementById('usePotionBtn');
+
+    function addBattleLog(msg, isError = false) {
+        const entry = document.createElement('div'); entry.className = 'log-entry';
+        if (isError) entry.style.borderLeftColor = "#e8554e";
+        entry.innerHTML = `📟 ${msg}`; battleLogDiv.prepend(entry);
+        while(battleLogDiv.children.length > 15) battleLogDiv.removeChild(battleLogDiv.lastChild);
+    }
+    function addShopLog(msg, isGood = true) {
+        const entry = document.createElement('div'); entry.className = 'log-entry';
+        entry.style.borderLeftColor = isGood ? "#f5b042" : "#e86f6f";
+        entry.innerHTML = `💰 ${msg}`; shopLogDiv.prepend(entry);
+        while(shopLogDiv.children.length > 12) shopLogDiv.removeChild(shopLogDiv.lastChild);
+    }
+
+    function applyDamage(amount, isAuto = false) {
+        if (isBroken || currentNokiaHp <= 0) return false;
+        let actualDamage = Math.min(amount, currentNokiaHp);
+        currentNokiaHp -= actualDamage;
+        if (currentNokiaHp < 0) currentNokiaHp = 0;
+        hitCounter++;
+        if (!isAuto) addBattleLog(`🔨 Удар | Урон ${actualDamage} | Осталось ${Math.floor(currentNokiaHp)}/${maxNokiaHp} HP`);
+        updateBattleUI(); saveGameData();
+        return true;
+    }
+    function getRandomDamage() {
+        const range = getCurrentDamageRange();
+        let dmg = Math.floor(Math.random() * (range.max - range.min + 1) + range.min);
+        if (Math.random() < 0.18) dmg = Math.floor(dmg * 1.5);
+        return dmg;
+    }
+    function manualHit() {
+        if (isBroken) { addBattleLog("Нокиа разбита...", true); return; }
+        if (currentNokiaHp <= 0) return;
+        phoneArena.style.transform = "scale(0.98)"; setTimeout(() => phoneArena.style.transform = "", 100);
+        applyDamage(getRandomDamage(), false);
+    }
+    function autoHit() { if (!isBroken && currentNokiaHp > 0) applyDamage(getRandomDamage(), true); }
+    function updateBattleUI() {
+        let percent = (currentNokiaHp / maxNokiaHp) * 100; if (percent < 0) percent = 0;
+        hpPercentSpan.innerText = Math.floor(percent) + "%";
+        healthFillDiv.style.width = percent + "%";
+        currentHpStatSpan.innerText = Math.floor(currentNokiaHp);
+        destroyedStatSpan.innerText = destroyedCount;
+        const dmg = getCurrentDamageRange(); damageStatSpan.innerText = `${dmg.min}-${dmg.max}`;
+        if (currentNokiaHp <= 0 && !isBroken) {
+            isBroken = true; hitBtn.disabled = true; nokiaBodyDiv.style.filter = "brightness(0.5) grayscale(0.6)";
+            addBattleLog(`💀 НОКИА #${nokiaLevel} УНИЧТОЖЕНА!`, true);
+            setTimeout(() => { if (isBroken) spawnNextNokia(); }, 1200);
+        } else { if (currentNokiaHp > 0 && isBroken) isBroken = false; nokiaBodyDiv.style.filter = ""; }
+        hitBtn.disabled = (currentNokiaHp <= 0 && isBroken);
+        if (percent > 60) healthFillDiv.style.background = "#6fcf6a";
+        else if (percent > 25) healthFillDiv.style.background = "#f0b27a";
+        else healthFillDiv.style.background = "#e67e22";
+    }
+    function grantCoinsForDestruction() { let reward = 35 + Math.floor(nokiaLevel * 1.8); coins += reward; addShopLog(`🎉 Уничтожение Нокии #${nokiaLevel} дало ${reward} монет!`, true); updateShopUI(); saveGameData(); }
+    function spawnNextNokia() {
+        if (!isBroken && currentNokiaHp > 0) return;
+        if (destroyedCount > 0 || nokiaLevel > 1) grantCoinsForDestruction();
+        nokiaLevel++; destroyedCount++;
+        maxNokiaHp = Math.floor(maxNokiaHp * 1.3); currentNokiaHp = maxNokiaHp;
+        isBroken = false; hitCounter = 0; hitBtn.disabled = false; nokiaBodyDiv.style.filter = "";
+        updateBattleUI(); addBattleLog(`✨ НОВАЯ НОКИА #${nokiaLevel} с HP ${maxNokiaHp} (+30%) ✨`, false); saveGameData();
+    }
+    function getUpgradeCost() { return Math.floor(80 + (powerLevel - 1) * 25); }
+    function upgradePower() { let cost = getUpgradeCost(); if (coins >= cost) { coins -= cost; powerLevel++; updateShopUI(); updateBattleUI(); addShopLog(`⭐ СИЛА до ${powerLevel} уровня!`, true); saveGameData(); } else addShopLog(`❌ Нужно ${cost} монет.`, false); }
+    function getAutoUpgradeCost() { return 500 + (autoLevel) * 500; }
+    function buyAutoUpgrade() { let cost = getAutoUpgradeCost(); if (coins >= cost) { coins -= cost; autoLevel++; autoHitsPerSecond = autoLevel; autoLevelSpan.innerText = autoLevel; autoHitsPerSecSpan.innerText = autoHitsPerSecond; restartAutoClicker(); updateShopUI(); addShopLog(`🤖 АВТО-КЛИКЕР уровень ${autoLevel} (${autoHitsPerSecond} уд/сек)!`, true); saveGameData(); } else addShopLog(`❌ Нужно ${cost} монет.`, false); }
+    function restartAutoClicker() { if (autoIntervalId) clearInterval(autoIntervalId); if (autoLevel > 0) autoIntervalId = setInterval(() => { if (!isBroken && currentNokiaHp > 0) autoHit(); }, 1000 / autoHitsPerSecond); }
+    function openLuckyChest() { const CHEST_COST = 20000; if (coins < CHEST_COST) { addShopLog(`❌ Нужно ${CHEST_COST} монет.`, false); return; } coins -= CHEST_COST; let r = Math.random() * 100; let reward = 0, msg = ""; if (r < 1) { reward = 20000000; msg = "20.000.000 монет!"; } else if (r < 50) { reward = 1000000; msg = "1.000.000 монет!"; } else if (r < 85) { reward = 5000; msg = "5.000 монет!"; } else { reward = 1000; msg = "1.000 монет."; } coins += reward; updateShopUI(); addShopLog(`🎁 ${msg}`, true); saveGameData(); }
+    
+    // ========== ЗЕЛЬЕ УДАЧИ (умножение монет) ==========
+    function useLuckPotion() {
+        const POTION_COST = 100000;
+        if (coins < POTION_COST) {
+            addShopLog(`❌ Не хватает монет для зелья! Нужно 100.000 монет.`, false);
+            return;
+        }
+        coins -= POTION_COST;
+        // Шансы: x0.5 (10%), x1 (20%), x1.5 (20%), x2 (30%), x3 (15%), x10 (5%)
+        let rand = Math.random() * 100;
+        let multiplier = 1;
+        let msg = "";
+        if (rand < 10) { multiplier = 0.5; msg = "x0.5 (не повезло!)"; }
+        else if (rand < 30) { multiplier = 1; msg = "x1 (без изменений)"; }
+        else if (rand < 50) { multiplier = 1.5; msg = "x1.5"; }
+        else if (rand < 80) { multiplier = 2; msg = "x2"; }
+        else if (rand < 95) { multiplier = 3; msg = "x3"; }
+        else { multiplier = 10; msg = "x10 🎉🎉🎉"; }
+        
+        let oldCoins = coins;
+        coins = Math.floor(coins * multiplier);
+        let gained = coins - oldCoins;
+        addShopLog(`🧪 Зелье удачи: ${msg}! Ваши монеты ${multiplier > 1 ? `увеличились на ${gained}` : multiplier < 1 ? `уменьшились на ${-gained}` : `не изменились`}`, multiplier >= 1);
+        updateShopUI();
+        saveGameData();
+    }
+    usePotionBtn.addEventListener('click', useLuckPotion);
+
+    function updateShopUI() { 
+        currencySpan.innerText = Math.floor(coins); 
+        upgradeShopDiv.innerHTML = `<div class="upgrade-card"><div class="upgrade-title">🔨 ПОВЫСИТЬ СИЛУ УДАРА</div><div class="upgrade-desc">Уровень: ${powerLevel} | Урон: ${getCurrentDamageRange().min}-${getCurrentDamageRange().max}</div><div class="upgrade-cost">💰 ЦЕНА: ${getUpgradeCost()} МОНЕТ</div><button class="upgrade-btn" id="upgradePowerBtn">💪 УЛУЧШИТЬ</button></div>`; 
+        document.getElementById('upgradePowerBtn')?.addEventListener('click', upgradePower); 
+        autoLevelSpan.innerText = autoLevel; 
+        autoHitsPerSecSpan.innerText = autoHitsPerSecond; 
+        autoCostDisplay.innerText = `💰 ЦЕНА: ${getAutoUpgradeCost()} МОНЕТ`; 
+    }
+
+    // ========== ВИКТОРИНА ==========
+    const quizQuestions = [
+        { question: "Сколько дней в високосном году?", answers: ["365", "366", "364", "367"], correct: 1 },
+        { question: "Столица Франции?", answers: ["Лондон", "Берлин", "Париж", "Мадрид"], correct: 2 },
+        { question: "Автор 'Войны и мира'?", answers: ["Достоевский", "Толстой", "Чехов", "Пушкин"], correct: 1 },
+        { question: "Цветов в радуге?", answers: ["5", "6", "7", "8"], correct: 2 },
+        { question: "Самая большая планета?", answers: ["Земля", "Марс", "Юпитер", "Сатурн"], correct: 2 },
+        { question: "Символ Au?", answers: ["Серебро", "Железо", "Золото", "Медь"], correct: 2 }
+    ];
+    let currentQuestionIndex = 0, quizScore = 0, totalAnswered = 0, canAnswer = true;
+    const questionText = document.getElementById('questionText'), answersGrid = document.getElementById('answersGrid');
+    const quizScoreSpan = document.getElementById('quizScore'), correctCountSpan = document.getElementById('correctCount');
+    const totalAnsweredSpan = document.getElementById('totalAnswered'), quizResultDiv = document.getElementById('quizResult');
+    const nextQuestionBtn = document.getElementById('nextQuestionBtn'), quizLogDiv = document.getElementById('quizLog');
+    function addQuizLog(msg, isGood = true) { const entry = document.createElement('div'); entry.className = 'log-entry'; entry.style.borderLeftColor = isGood ? "#42c5f0" : "#e86f6f"; entry.innerHTML = `🎮 ${msg}`; quizLogDiv.prepend(entry); while(quizLogDiv.children.length > 12) quizLogDiv.removeChild(quizLogDiv.lastChild); }
+    function loadQuestion() { if (!canAnswer) return; const q = quizQuestions[currentQuestionIndex]; questionText.innerText = q.question; answersGrid.innerHTML = ''; q.answers.forEach((ans, idx) => { const btn = document.createElement('button'); btn.className = 'answer-btn'; btn.innerText = ans; btn.onclick = () => checkAnswer(idx); answersGrid.appendChild(btn); }); quizResultDiv.innerText = ''; }
+    function checkAnswer(selectedIdx) { if (!canAnswer) return; const q = quizQuestions[currentQuestionIndex]; const isCorrect = (selectedIdx === q.correct); totalAnswered++; if (isCorrect) { quizScore++; coins += 50; addQuizLog(`✅ Верно! +50 монет.`, true); quizResultDiv.innerHTML = `✅ Правильно! +50 монет!`; updateShopUI(); saveGameData(); } else { quizResultDiv.innerHTML = `❌ Неправильно. Ответ: ${q.answers[q.correct]}`; addQuizLog(`❌ Ошибка. Правильно: ${q.answers[q.correct]}`, false); } quizScoreSpan.innerText = quizScore; correctCountSpan.innerText = quizScore; totalAnsweredSpan.innerText = totalAnswered; canAnswer = false; document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true); }
+    function nextQuestion() { currentQuestionIndex = (currentQuestionIndex + 1) % quizQuestions.length; canAnswer = true; loadQuestion(); }
+    nextQuestionBtn.addEventListener('click', nextQuestion);
+
+    // ========== КОЛЕСО ФОРТУНЫ ==========
+    const multipliers = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const wheelResultDiv = document.getElementById('wheelResult');
+    const betInput = document.getElementById('betAmount');
+    const spinBtn = document.getElementById('spinWheelBtn');
+    const wheelLogDiv = document.getElementById('wheelLog');
+    function addWheelLog(msg, isGood = true) { const entry = document.createElement('div'); entry.className = 'log-entry'; entry.style.borderLeftColor = isGood ? "#f5b042" : "#e86f6f"; entry.innerHTML = `🎡 ${msg}`; wheelLogDiv.prepend(entry); while(wheelLogDiv.children.length > 12) wheelLogDiv.removeChild(wheelLogDiv.lastChild); }
+    function spinWheel() {
+        let bet = parseInt(betInput.value);
+        if (isNaN(bet) || bet < 10) { addWheelLog("❌ Минимальная ставка 10 монет!", false); return; }
+        if (bet > coins) { addWheelLog(`❌ Не хватает монет! У вас ${Math.floor(coins)}`, false); return; }
+        const randomIndex = Math.floor(Math.random() * multipliers.length);
+        const multiplier = multipliers[randomIndex];
+        const winAmount = bet * multiplier;
+        coins -= bet;
+        coins += winAmount;
+        updateShopUI();
+        addWheelLog(`🎲 Выпал множитель x${multiplier}! ${bet} x ${multiplier} = ${winAmount} монет!`, true);
+        wheelResultDiv.innerHTML = `✨ x${multiplier} ✨<br>Вы выиграли ${winAmount} монет!`;
+        saveGameData();
+    }
+    spinBtn.addEventListener('click', spinWheel);
+
+    // ========== ПЕРЕКЛЮЧЕНИЕ ИГР ==========
+    const gameTabs = document.querySelectorAll('.games-tab-btn');
+    const panes = { quiz: document.getElementById('quizPane'), wheel: document.getElementById('wheelPane') };
+    gameTabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const game = btn.getAttribute('data-game');
+            gameTabs.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            Object.values(panes).forEach(pane => pane.classList.remove('active-pane'));
+            if (game === 'quiz') panes.quiz.classList.add('active-pane');
+            if (game === 'wheel') panes.wheel.classList.add('active-pane');
+        });
+    });
+
+    // ========== КОДЫ ==========
+    function addCodeLog(msg, isError = false) { const entry = document.createElement('div'); entry.className = 'log-entry'; entry.style.borderLeftColor = isError ? "#e86f6f" : "#42c5f0"; entry.innerHTML = `🔐 ${msg}`; document.getElementById('codeLog').prepend(entry); while(document.getElementById('codeLog').children.length > 12) document.getElementById('codeLog').removeChild(document.getElementById('codeLog').lastChild); }
+    function activateCode(code) { const normalized = code.trim().toLowerCase(); if (activatedCodes.includes(normalized)) { addCodeLog(`❌ Код уже активирован!`, true); return; } let reward = 0, msg = ""; if (normalized === "ded") { reward = 1000; msg = "+1.000 монет!"; } else if (normalized === "dedule2") { reward = 100000000; msg = "+100.000.000 монет!"; } else { addCodeLog(`❌ Неизвестный код`, true); return; } coins += reward; activatedCodes.push(normalized); localStorage.setItem('activatedCodesBS', JSON.stringify(activatedCodes)); updateShopUI(); updateBattleUI(); addCodeLog(msg, false); saveGameData(); }
+    document.getElementById('submitCodeBtn').addEventListener('click', () => { activateCode(document.getElementById('codeInput').value); document.getElementById('codeInput').value = ''; });
+    document.getElementById('codeInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('submitCodeBtn').click(); });
+
+    // ========== ТЕМЫ И СОХРАНЕНИЕ ==========
+    function saveGameData() { localStorage.setItem('nokiaPowerAutoSave', JSON.stringify({ powerLevel, coins, nokiaLevel, destroyedCount, maxNokiaHp, currentNokiaHp, isBroken, hitCounter, autoLevel, autoHitsPerSecond, activatedCodes, quizScore, totalAnswered })); }
+    function loadGameData() {
+        const saved = localStorage.getItem('nokiaPowerAutoSave');
+        if (saved) { try { const d = JSON.parse(saved); powerLevel = d.powerLevel || 1; coins = d.coins ?? 150; nokiaLevel = d.nokiaLevel || 1; destroyedCount = d.destroyedCount || 0; maxNokiaHp = d.maxNokiaHp || 100; currentNokiaHp = d.currentNokiaHp ?? maxNokiaHp; isBroken = d.isBroken || false; hitCounter = d.hitCounter || 0; autoLevel = d.autoLevel || 0; autoHitsPerSecond = d.autoHitsPerSecond || 0; activatedCodes = d.activatedCodes || []; quizScore = d.quizScore || 0; totalAnswered = d.totalAnswered || 0; if (currentNokiaHp <= 0) isBroken = true; updateBattleUI(); updateShopUI(); quizScoreSpan.innerText = quizScore; correctCountSpan.innerText = quizScore; totalAnsweredSpan.innerText = totalAnswered; restartAutoClicker(); if(isBroken && currentNokiaHp <= 0) setTimeout(() => { if(isBroken) spawnNextNokia(); }, 500); } catch(e) {} } else { updateShopUI(); updateBattleUI(); loadQuestion(); } }
+    function setTheme(theme) { document.body.classList.remove('light', 'dark'); document.body.classList.add(theme); localStorage.setItem('nokiaTheme', theme); }
+    function loadTheme() { setTheme(localStorage.getItem('nokiaTheme') === 'dark' ? 'dark' : 'light'); }
+
+    hitBtn.addEventListener('click', manualHit);
+    resetBattleBtn.addEventListener('click', () => { if (confirm("Сбросить бой?")) { nokiaLevel = 1; destroyedCount = 0; maxNokiaHp = 100; currentNokiaHp = 100; isBroken = false; hitCounter = 0; updateBattleUI(); addBattleLog("🔄 БОЙ СБРОШЕН!", false); saveGameData(); } });
+    phoneArena.addEventListener('click', (e) => { if(e.target !== hitBtn && !isBroken && currentNokiaHp > 0) manualHit(); });
+    buyAutoBtn.addEventListener('click', buyAutoUpgrade);
+    openChestBtn.addEventListener('click', openLuckyChest);
+    document.getElementById('lightThemeBtn').addEventListener('click', () => setTheme('light'));
+    document.getElementById('darkThemeBtn').addEventListener('click', () => setTheme('dark'));
+
+    loadTheme();
+    loadGameData();
+    loadQuestion();
+    canAnswer = true;
+    restartAutoClicker();
+</script>
+</body>
+</html>
